@@ -1,6 +1,7 @@
-gulp   = require 'gulp'
-coffee = require 'gulp-coffee'
-less   = require 'gulp-less'
+require('coffee-script/register')
+gulp       = require 'gulp'
+coffee     = require 'gulp-coffee'
+less       = require 'gulp-less'
 rimraf     = require 'rimraf'
 fs         = require 'fs'
 gutil      = require 'gulp-util'
@@ -10,6 +11,7 @@ install    = require 'gulp-install'
 concat     = require 'gulp-concat'
 autoReload = require 'gulp-auto-reload'
 changed    = require 'gulp-changed'
+mocha      = require 'gulp-mocha'
 
 outapp = './app'
 outui  = outapp + '/ui'
@@ -103,9 +105,19 @@ gulp.task 'reloader', ->
 gulp.task 'clean', (cb) ->
     rimraf outapp, cb
 
+gulp.task 'test', ->
+    gulp.src 'test/**/*.coffee'
+        .pipe mocha(reporter:'list')
+
 gulp.task 'default', ['package', 'coffee', 'html', 'images', 'less', 'fontello']
 
 gulp.task 'watch', ['default', 'reloader', 'html'], ->
   # watch to rebuild
   sources = (v for k, v of paths)
   gulp.watch sources, ['default']
+
+gulp.task 'watchtest', ['test'], ->
+  # watch to rebuild
+  sources = (v for k, v of paths)
+  sources.push 'test/**/*'
+  gulp.watch sources, ['test']

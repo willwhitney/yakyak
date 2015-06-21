@@ -1,5 +1,13 @@
-# just so that fnuc loads before we redefine eql
-require 'hangupsjs'
+# jsdom to get a window object
+jsdom           = require('jsdom').jsdom
+global.window   = jsdom().defaultView
+global.document = window.document
+global.srlz     = require('jsdom').serializeDocument
+
+global.document.__JSDOM = 'jsdom'
+
+# insert globals
+require '../src/ui/app.coffee'
 
 global.chai   = require 'chai'
 
@@ -9,7 +17,6 @@ sinon  = require 'sinon'
 global.stub   = sinon.stub
 global.spy    = sinon.spy
 global.assert = chai.assert
-global.eql    = chai.assert.deepEqual
 
 # trifl globals
 global.updated = ->
