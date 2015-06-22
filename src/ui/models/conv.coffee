@@ -143,7 +143,7 @@ conv.fromEvent = (e) ->
             self_conversation_state:
                 self_read_state:
                     latest_read_timestamp: 0
-                sort_timestamp: Date.now() * 1000
+                sort_timestamp: e.timestamp ? Date.now() * 1000
         event: []
     }
 
@@ -197,5 +197,6 @@ conv.addEvent = do ->
         c.event[indexForEvent(e)] = e
     updateSorttime = tap ([e, c]) ->
         # update the timestamp of the conversation
-        sorttime c, (e.timestamp ? Date.now() * 1000)
+        newtime = e.timestamp ? Date.now() * 1000
+        sorttime c, newtime if newtime > sorttime c
     sequence lookup, insertEvent, updateSorttime

@@ -97,6 +97,90 @@ describe 'convFromEvent', ->
         assert.equal c.conversation?.current_participant?[1]?.participant_id?.chat_id, 'ci2'
         assert.equal c.conversation?.current_participant?[1]?.participant_id?.gaia_id, 'gi2'
 
+    it 'sets event timestamp as sort_timestamp', ->
+        e =
+            conversation_id:id:'c1'
+            timestamp: 123
+        c = conv.fromEvent e
+        assert.equal c.conversation.self_conversation_state.sort_timestamp, 123
+
+
+
+describe 'conv.addEvent', ->
+
+    beforeEach ->
+        conv.init()
+
+    it 'creates the conv if not there', ->
+        conv.addEvent
+            conversation_id:id:'c1'
+        assert.isObject conv.lookup.c1
+
+    it 'inserts the event by appending', ->
+        conv.addEvent e1 =
+            conversation_id:id:'c1'
+            event_id:'ev1'
+        conv.addEvent e2 =
+            conversation_id:id:'c1'
+            event_id:'ev2'
+        assert.deepEqual conv.lookup.c1.event, [e1, e2]
+
+    it 'overwrites if same event_id', ->
+        conv.addEvent e1 =
+            conversation_id:id:'c1'
+            event_id:'ev1'
+        conv.addEvent e2 =
+            conversation_id:id:'c1'
+            event_id:'ev1'
+        assert.deepEqual conv.lookup.c1.event, [e2]
+
+    it 'overwrites if same client_generated_id', ->
+        conv.addEvent e1 =
+            conversation_id:id:'c1'
+            event_id:'ev1'
+            self_event_state:client_generated_id:'cg1'
+        conv.addEvent e2 =
+            conversation_id:id:'c1'
+            event_id:'ev2'
+            self_event_state:client_generated_id:'cg1'
+        assert.deepEqual conv.lookup.c1.event, [e2]
+
+    it 'updates the sort time to that of the event', ->
+        conv.addEvent
+            conversation_id:id:'c1'
+            event_id:'ev1'
+        ts = Date.now() * 1000 + 500
+        assert.isTrue conv.lookup.c1.conversation.self_conversation_state.sort_timestamp < ts
+        conv.addEvent
+            conversation_id:id:'c1'
+            event_id:'ev1'
+            timestamp: ts # set it
+        assert.equal conv.lookup.c1.conversation.self_conversation_state.sort_timestamp, ts
+
+    it 'doesnt update to time of event if older', ->
+        conv.addEvent
+            conversation_id:id:'c1'
+            event_id:'ev1'
+        ts = Date.now() * 1000 - 500
+        assert.isTrue conv.lookup.c1.conversation.self_conversation_state.sort_timestamp > ts
+        conv.addEvent
+            conversation_id:id:'c1'
+            event_id:'ev1'
+            timestamp: ts # set it
+        assert.isTrue conv.lookup.c1.conversation.self_conversation_state.sort_timestamp != ts
+
+    it 'generates a timestamp if not set in event', ->
+        ts = Date.now() * 1000 - 500
+        conv.addEvent
+            conversation_id:id:'c1'
+            event_id:'ev1'
+            timestamp: ts
+        assert.equal conv.lookup.c1.conversation.self_conversation_state.sort_timestamp, ts
+        conv.addEvent
+            conversation_id:id:'c1'
+            event_id:'ev1'
+        assert.isTrue conv.lookup.c1.conversation.self_conversation_state.sort_timestamp > ts
+
 
 
     # # add a chat message to conversation
