@@ -19,5 +19,11 @@ do (glob = (global ? window)) ->
     # and fnuc
     require('fnuc').expose glob
 
+    # expose utility globally
+    merge glob, require './util'
+
     # expose all conv functions
     glob.conv = require './models/conv'
+
+    # expose all entity functions
+    glob.entity = require './models/entity'
