@@ -111,8 +111,8 @@ app.on 'ready', ->
 
     # Create the system tray
     trayIcons = {
-        "read": path.join __dirname, 'icons', 'icon.png'
-        "unread": path.join __dirname, 'icons', 'icon-unread.png'
+        "read": path.join __dirname, 'icons', 'tray_icon_read.png'
+        "unread": path.join __dirname, 'icons', 'tray_icon_unread.png'
     }
     tray = new Tray trayIcons["read"]
     contextMenu = Menu.buildFromTemplate [
@@ -269,7 +269,7 @@ app.on 'ready', ->
 
     ipc.on 'updatebadge', (ev, value) ->
         app.dock.setBadge(value) if app.dock
-        try 
+        try
           if value > 0
               tray.setImage trayIcons["unread"]
           else
