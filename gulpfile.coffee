@@ -78,6 +78,11 @@ gulp.task 'icons', ->
         'icon_256.png': 'icon@16.png'
         'icon_512.png': 'icon@32.png'
 
+        'tray_icon_read@1x.png': 'tray_icon_read@1x.png'
+        'tray_icon_read@2x.png': 'tray_icon_read@2x.png'
+        'tray_icon_unread@1x.png': 'tray_icon_unread@1x.png'
+        'tray_icon_unread@2x.png': 'tray_icon_unread@2x.png'
+
     Object.keys(nameMap).forEach (name) ->
         gulp.src path.join paths.icons, name
             .pipe rename nameMap[name]
